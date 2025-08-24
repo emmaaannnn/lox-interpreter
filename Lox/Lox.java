@@ -1,5 +1,4 @@
 package Lox;
-import static Lox.Scanner.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
