@@ -14,9 +14,16 @@ enum TokenType {
     // Literals.
     IDENTIFIER, STRING, NUMBER,
 
+    RIVER_NAME, FLOW_RATE,
+
+    FLOWS_TO, COMBINE,
+
     // Keywords.
     AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
     PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
+
+    RAINFALL, OUTPUT, SYSTEM,
+    RIVER, DAM,
 
     // End of file.
     EOF

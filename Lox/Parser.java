@@ -1,6 +1,7 @@
 package Lox;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import static Lox.TokenType.*;
 
@@ -13,7 +14,15 @@ class Parser {
         this.tokens = tokens;
     }
     
-    Expr parse() {
+    Stmt parse() {
+        try {
+            return declaration();
+        } catch (ParseError error) {
+            return null;
+        }
+    }
+
+    Expr parseExpression() {
         try {
             return expression();
         } catch (ParseError error) {
@@ -21,6 +30,60 @@ class Parser {
         }
     }
 
+    List<Stmt> parseStatements() {
+        List<Stmt> statements = new ArrayList<>();
+        while (!isAtEnd()) {
+            statements.add(declaration());
+        }
+        return statements;
+    }
+
+    // Entry point for statements
+    private Stmt declaration() {
+        try {
+            if (match(RIVER)) return riverDeclaration();
+            return statement();
+        } catch (ParseError error) {
+            synchronize();
+            return null;
+        }
+    }
+
+    private Stmt statement() {
+        // Extend with other statement types if needed
+        return new Stmt.Expression(expression());
+    }
+
+    // DSL-specific river syntax
+    private Stmt riverDeclaration() {
+        Token name = consume(IDENTIFIER, "Expect river name.");
+
+        if (match(EQUAL)) {
+            Token type = consume(IDENTIFIER, "Expect 'root' or 'output'.");
+            consume(SEMICOLON, "Expect ';' after declaration.");
+            return new Stmt.RiverDeclaration(name, type);
+        }
+
+        if (match(FLOWS_TO)) {
+            Token target = consume(IDENTIFIER, "Expect target river or dam.");
+            consume(SEMICOLON, "Expect ';' after flow statement.");
+            return new Stmt.RiverFlow(name, target);
+        }
+
+        if (match(COMBINE)) {
+            List<Token> sources = new ArrayList<>();
+            do {
+                sources.add(consume(IDENTIFIER, "Expect river name."));
+            } while (match(COMMA));
+            consume(SEMICOLON, "Expect ';' after combination.");
+            return new Stmt.RiverCombination(name, sources);
+        }
+
+        throw error(peek(), "Invalid river statement.");
+    }
+
+
+    // Expression Parsing
     private Expr expression() {
         return equality();
     }

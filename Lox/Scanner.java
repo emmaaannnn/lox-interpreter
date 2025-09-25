@@ -33,6 +33,15 @@ class Scanner {
         keywords.put("true", TRUE);
         keywords.put("var", VAR);
         keywords.put("while", WHILE);
+
+        // River-specific keywords
+        keywords.put("river", TokenType.RIVER);
+        keywords.put("dam", TokenType.DAM);
+        keywords.put("flows", TokenType.FLOWS_TO); // if using "flows to"
+        keywords.put("combine", TokenType.COMBINE);
+        keywords.put("output", TokenType.OUTPUT);
+        keywords.put("system", TokenType.SYSTEM);
+        keywords.put("rainfall", TokenType.RAINFALL);
     }
     
     Scanner(String source) {

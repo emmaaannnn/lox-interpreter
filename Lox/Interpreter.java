@@ -1,15 +1,21 @@
 package Lox;
 
-class Interpreter implements Expr.Visitor<Object> {
-    void interpret(Expr expression) {
+import java.util.List;
+
+class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
+    void interpret(List<Stmt> statements) {
         try {
-            Object value = evaluate(expression);
-            System.out.println(stringify(value));
+            for (Stmt stmt : statements) {
+                execute(stmt);
+            }
         } catch (RuntimeError error) {
             Lox.runtimeError(error);
         }
     }
-    
+
+    private void execute(Stmt stmt) {
+        stmt.accept(this);
+    }
 
     @Override
     public Object visitLiteralExpr(Expr.Literal expr) {
@@ -120,6 +126,36 @@ class Interpreter implements Expr.Visitor<Object> {
         }
 
         // Unreachable.
+        return null;
+    }
+
+    //River Statements
+    @Override
+    public Void visitExpressionStmt(Stmt.Expression stmt) {
+        Object value = evaluate(stmt.expression);
+        System.out.println(stringify(value));
+        return null;
+    }
+
+    @Override
+    public Void visitRiverDeclarationStmt(Stmt.RiverDeclaration stmt) {
+        System.out.println("Declare river: " + stmt.name.lexeme + " as " + stmt.type.lexeme);
+        return null;
+    }
+
+    @Override
+    public Void visitRiverFlowStmt(Stmt.RiverFlow stmt) {
+        System.out.println("River " + stmt.from.lexeme + " flows to " + stmt.to.lexeme);
+        return null;
+    }
+
+    @Override
+    public Void visitRiverCombinationStmt(Stmt.RiverCombination stmt) {
+        String sources = "";
+        for (Token source : stmt.sources) {
+            sources += source.lexeme + " ";
+        }
+        System.out.println("River " + stmt.name.lexeme + " combines: " + sources.trim());
         return null;
     }
 }
