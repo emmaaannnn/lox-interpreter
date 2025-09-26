@@ -37,11 +37,12 @@ class Scanner {
         // River-specific keywords
         keywords.put("river", TokenType.RIVER);
         keywords.put("dam", TokenType.DAM);
-        keywords.put("flows", TokenType.FLOWS_TO); // if using "flows to"
+        keywords.put("flows", TokenType.FLOWS_TO);
         keywords.put("combine", TokenType.COMBINE);
         keywords.put("output", TokenType.OUTPUT);
         keywords.put("system", TokenType.SYSTEM);
         keywords.put("rainfall", TokenType.RAINFALL);
+        keywords.put("with", TokenType.WITH);
     }
     
     Scanner(String source) {

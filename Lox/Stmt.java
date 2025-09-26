@@ -8,6 +8,9 @@ abstract class Stmt {
         R visitRiverDeclarationStmt(RiverDeclaration stmt);
         R visitRiverFlowStmt(RiverFlow stmt);
         R visitRiverCombinationStmt(RiverCombination stmt);
+        R visitRainfallDeclarationStmt(RainfallDeclaration stmt);
+        R visitRiverDeclarationWithFlowStmt(RiverDeclarationWithFlow stmt);
+        R visitRiverCombinationExprStmt(RiverCombinationExpr stmt);
     }
 
     static class Expression extends Stmt {
@@ -20,6 +23,21 @@ abstract class Stmt {
         @Override
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitExpressionStmt(this);
+        }
+    }
+
+    static class RiverCombinationExpr extends Stmt {
+        final Token name;
+        final Expr expression;
+
+        RiverCombinationExpr(Token name, Expr expression) {
+            this.name = name;
+            this.expression = expression;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitRiverCombinationExprStmt(this);
         }
     }
 
@@ -65,6 +83,36 @@ abstract class Stmt {
         @Override
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitRiverCombinationStmt(this);
+        }
+    }
+
+    static class RainfallDeclaration extends Stmt {
+        final Token value;
+
+        RainfallDeclaration(Token value) {
+            this.value = value;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitRainfallDeclarationStmt(this);
+        }
+    }
+
+    static class RiverDeclarationWithFlow extends Stmt {
+        final Token name;
+        final Token type; // 'root'
+        final Token flowRate; // number token
+
+        RiverDeclarationWithFlow(Token name, Token type, Token flowRate) {
+            this.name = name;
+            this.type = type;
+            this.flowRate = flowRate;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitRiverDeclarationWithFlowStmt(this);
         }
     }
 

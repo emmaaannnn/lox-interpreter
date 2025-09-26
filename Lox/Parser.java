@@ -41,6 +41,7 @@ class Parser {
     // Entry point for statements
     private Stmt declaration() {
         try {
+            if (match(RAINFALL)) return rainfallDeclaration();
             if (match(RIVER)) return riverDeclaration();
             return statement();
         } catch (ParseError error) {
@@ -59,9 +60,22 @@ class Parser {
         Token name = consume(IDENTIFIER, "Expect river name.");
 
         if (match(EQUAL)) {
-            Token type = consume(IDENTIFIER, "Expect 'root' or 'output'.");
-            consume(SEMICOLON, "Expect ';' after declaration.");
-            return new Stmt.RiverDeclaration(name, type);
+            // Peek ahead to decide if it's a symbolic combination or a type declaration
+            if (check(IDENTIFIER) && (checkNext(WITH) || checkNext(SEMICOLON))) {
+                Token type = consume(IDENTIFIER, "Expect 'root' or 'output'.");
+                if (match(WITH)) {
+                    Token flowRate = consume(NUMBER, "Expect flow rate in L/s.");
+                    consume(SEMICOLON, "Expect ';' after declaration.");
+                    return new Stmt.RiverDeclarationWithFlow(name, type, flowRate);
+                }
+                consume(SEMICOLON, "Expect ';' after declaration.");
+                return new Stmt.RiverDeclaration(name, type);
+            }
+
+            // Otherwise, treat it as a symbolic combination expression
+            Expr expr = expression();
+            consume(SEMICOLON, "Expect ';' after river combination.");
+            return new Stmt.RiverCombinationExpr(name, expr);
         }
 
         if (match(FLOWS_TO)) {
@@ -82,6 +96,17 @@ class Parser {
         throw error(peek(), "Invalid river statement.");
     }
 
+    private Stmt rainfallDeclaration() {
+        consume(EQUAL, "Expect '=' after 'rainfall'.");
+        Token value = consume(NUMBER, "Expect rainfall value in mm.");
+        consume(SEMICOLON, "Expect ';' after rainfall declaration.");
+        return new Stmt.RainfallDeclaration(value);
+    }
+
+    private boolean checkNext(TokenType type) {
+        if (current + 1 >= tokens.size()) return false;
+        return tokens.get(current + 1).type == type;
+    }
 
     // Expression Parsing
     private Expr expression() {

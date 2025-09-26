@@ -1,5 +1,6 @@
 package Lox;
 
+import java.util.ArrayList;
 import java.util.List;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
@@ -113,7 +114,34 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                 if (left instanceof String && right instanceof String) {
                     return (String)left + (String)right;
                 }
-                throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings.");
+
+                // River name + River name → list of names
+                if (left instanceof String && right instanceof String) {
+                    return List.of(left, right);
+                }
+
+                // List + String → append river name
+                if (left instanceof List && right instanceof String) {
+                    List<Object> merged = new ArrayList<>((List<?>) left);
+                    merged.add(right);
+                    return merged;
+                }
+
+                // String + List → prepend river name
+                if (left instanceof String && right instanceof List) {
+                    List<Object> merged = new ArrayList<>();
+                    merged.add(left);
+                    merged.addAll((List<?>) right);
+                    return merged;
+                }
+
+                // List + List → merge river names
+                if (left instanceof List && right instanceof List) {
+                    List<Object> merged = new ArrayList<>((List<?>) left);
+                    merged.addAll((List<?>) right);
+                    return merged;
+                }
+                throw new RuntimeError(expr.operator, "Operands must be numbers, strings, or river names.\".");
             case SLASH:
                 checkNumberOperands(expr.operator, left, right);
                 return (double)left / (double)right;
@@ -156,6 +184,26 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             sources += source.lexeme + " ";
         }
         System.out.println("River " + stmt.name.lexeme + " combines: " + sources.trim());
+        return null;
+    }
+
+    @Override
+    public Void visitRainfallDeclarationStmt(Stmt.RainfallDeclaration stmt) {
+        System.out.println("Rainfall set to: " + stmt.value.literal + " mm");
+        return null;
+    }
+
+    @Override
+    public Void visitRiverDeclarationWithFlowStmt(Stmt.RiverDeclarationWithFlow stmt) {
+        System.out.println("Declare river: " + stmt.name.lexeme + " as " + stmt.type.lexeme +
+            " with flow rate " + stmt.flowRate.literal + " L/s per mm");
+        return null;
+    }
+
+    @Override
+    public Void visitRiverCombinationExprStmt(Stmt.RiverCombinationExpr stmt) {
+        Object result = evaluate(stmt.expression);
+        System.out.println("River " + stmt.name.lexeme + " is combination of: " + stringify(result));
         return null;
     }
 }
