@@ -1,0 +1,7 @@
+rainfall = 1;
+
+river googong = root with 10;
+river jerrabombarra = root with 5;
+
+river lower = googong + jerrabombarra;
+river upper = lower + lower;
