@@ -76,13 +76,22 @@ cd lox-interpreter
 javac Lox/*.java
 ``` 
 
-### Step 3 – Run the interpreter with an example .riv file
+### Step 3 – Run the parser with any example .riv file
 ```bash
 java Lox.Lox examples/example1.riv
-``` 
+java Lox.Lox examples/example2.riv
+java Lox.Lox examples/example3.riv
+```
 
 ### Step 4 – Verify output
-Check the console output to confirm that the parser successfully recognized and built the AST for program.
+Check the console output to confirm that the parser successfully recognized and built the AST for the program.
+The output will be a list of parsed statements (AST nodes), for example:
+```
+[Lox.Stmt$RainfallDeclaration@6d06d69c, Lox.Stmt$RiverDeclarationWithFlow@7852e922, ...]
+```
+
+This confirms that your program was parsed successfully.  
+**Note:** The parser does not evaluate or simulate river flows; it only builds the AST.
 
 ---
 
