@@ -34,15 +34,16 @@ class Scanner {
         keywords.put("var", VAR);
         keywords.put("while", WHILE);
 
-        // River-specific keywords
-        keywords.put("river", TokenType.RIVER);
-        keywords.put("dam", TokenType.DAM);
-        keywords.put("flows", TokenType.FLOWS_TO);
-        keywords.put("combine", TokenType.COMBINE);
-        keywords.put("output", TokenType.OUTPUT);
-        keywords.put("system", TokenType.SYSTEM);
-        keywords.put("rainfall", TokenType.RAINFALL);
-        keywords.put("with", TokenType.WITH);
+        // river-specific keywords
+        keywords.put("rainfall", RAINFALL);
+        keywords.put("river", RIVER);
+        keywords.put("dam", DAM);
+        keywords.put("flows", FLOWS_TO); // adapt to exact lexeme if scanner tokenizes 'flows to' or 'flows_to'
+        keywords.put("combine", COMBINE);
+        keywords.put("output", OUTPUT);
+        keywords.put("system", SYSTEM);
+        keywords.put("with", WITH);
+        // add any other custom keywords you use
     }
     
     Scanner(String source) {

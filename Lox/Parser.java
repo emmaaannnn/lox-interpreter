@@ -151,17 +151,6 @@ class Parser {
         return tokens.get(current + 1).type == type;
     }
 
-    // Expression Parsing
-    private Expr expression() {
-        return assignment();
-    }
-
-    private Stmt statement() {
-        if (match(PRINT)) return printStatement();
-        if (match(LEFT_BRACE)) return new Stmt.Block(block());
-        return expressionStatement();
-    }
-
     private Expr equality() {
         Expr expr = comparison();
 

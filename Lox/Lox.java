@@ -60,6 +60,13 @@ public class Lox {
         // Stop if there was a syntax error.
         if (hadError) return;
         
+        // Simple AST dump for debugging if interpreter not desired:
+        AstPrinter printer = new AstPrinter();
+        for (Stmt s : statements) {
+            System.out.println(s); // or implement s.toString() / pretty print
+        }
+
+        // Use interpreter if implemented:
         interpreter.interpret(statements);
     }
 
