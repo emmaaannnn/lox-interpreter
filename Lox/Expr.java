@@ -2,6 +2,11 @@ package Lox;
 
 import java.util.List;
 
+import Lox.Expr.Binary;
+import Lox.Expr.Grouping;
+import Lox.Expr.Literal;
+import Lox.Expr.Unary;
+
 abstract class Expr {
     interface Visitor<R> {
         R visitBinaryExpr(Binary expr);
@@ -66,6 +71,22 @@ abstract class Expr {
 
         final Token operator;
         final Expr right;
+    }
+
+    static class Variable {
+        final Token name;
+        public Variable(Token name) {
+            this.name = name;
+        }
+    }
+
+    static class Assign {
+        final Token name;
+        final Expr value;
+        public Assign(Token name, Expr value) {
+            this.name = name;
+            this.value = value;
+        }
     }
 
     abstract <R> R accept(Visitor<R> visitor);

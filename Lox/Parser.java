@@ -14,12 +14,13 @@ class Parser {
         this.tokens = tokens;
     }
     
-    Stmt parse() {
-        try {
-            return declaration();
-        } catch (ParseError error) {
-            return null;
+    List<Stmt> parse() {
+        List<Stmt> statements = new ArrayList<>();
+        while (!isAtEnd()) {
+            statements.add(declaration());
         }
+
+        return statements;
     }
 
     Expr parseExpression() {
@@ -30,19 +31,14 @@ class Parser {
         }
     }
 
-    List<Stmt> parseStatements() {
-        List<Stmt> statements = new ArrayList<>();
-        while (!isAtEnd()) {
-            statements.add(declaration());
-        }
-        return statements;
-    }
-
     // Entry point for statements
     private Stmt declaration() {
         try {
+            if (match(VAR)) return varDeclaration();
             if (match(RAINFALL)) return rainfallDeclaration();
             if (match(RIVER)) return riverDeclaration();
+            if (match(DAM)) return damDeclaration();
+            
             return statement();
         } catch (ParseError error) {
             synchronize();
@@ -50,9 +46,69 @@ class Parser {
         }
     }
 
+    private Expr expression() {
+        return equality(); // Assuming equality is the starting point for expressions
+    }
+
     private Stmt statement() {
-        // Extend with other statement types if needed
-        return new Stmt.Expression(expression());
+        if (match(TokenType.PRINT)) {
+            return printStatement();
+        }
+        // Add other statement types here...
+        return null; // Or throw an error for unsupported statements
+    }
+
+    private Stmt printStatement() {
+        Expr value = expression();
+        consume(SEMICOLON, "Expect ';' after value.");
+        return new Stmt.Print(value);
+    }
+
+    private Stmt varDeclaration() {
+        Token name = consume(IDENTIFIER, "Expect variable name.");
+        Expr initializer = null;
+        
+        if (match(EQUAL)) {
+            initializer = expression();
+        }
+        
+        consume(SEMICOLON, "Expect ';' after variable declaration.");
+
+        return new Stmt.Var(name, initializer);
+    }
+
+    private Stmt expressionStatement() {
+        Expr expr = expression();
+        consume(SEMICOLON, "Expect ';' after expression.");
+        return new Stmt.Expression(expr);
+    }
+
+    private List<Stmt> block() {
+        List<Stmt> statements = new ArrayList<>();
+
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
+            statements.add(declaration());
+        }
+        
+        consume(RIGHT_BRACE, "Expect '}' after block.");
+        return statements;
+    }
+
+    private Expr assignment() {
+        Expr expr = equality();
+        
+        if (match(EQUAL)) {
+            Token equals = previous();
+            Expr value = assignment();
+
+            if (expr instanceof Expr.Variable) {
+                Token name = ((Expr.Variable)expr).name;
+                return new Expr.Assign(name, value);
+            }
+
+            error(equals, "Invalid assignment target.");
+        }
+        return expr;
     }
 
     // DSL-specific river syntax
@@ -106,11 +162,6 @@ class Parser {
     private boolean checkNext(TokenType type) {
         if (current + 1 >= tokens.size()) return false;
         return tokens.get(current + 1).type == type;
-    }
-
-    // Expression Parsing
-    private Expr expression() {
-        return equality();
     }
 
     private Expr equality() {
@@ -178,6 +229,10 @@ class Parser {
 
         if (match(NUMBER, STRING)) {
             return new Expr.Literal(previous().literal);
+        }
+
+        if (match(IDENTIFIER)) {
+            return new Expr.Variable(previous());
         }
 
         if (match(LEFT_PAREN)) {
@@ -253,5 +308,22 @@ class Parser {
 
             advance();
         }
+    }
+
+    private Stmt damDeclaration() {
+        Token name = consume(IDENTIFIER, "Expect dam name.");
+
+        Token multiplier = null;
+        Token cap = null;
+
+        if (match(WITH)) {
+            multiplier = consume(NUMBER, "Expect multiplier.");
+            if (match(COMMA)) {
+                cap = consume(NUMBER, "Expect cap.");
+            }
+        }
+
+        consume(SEMICOLON, "Expect ';' after dam declaration.");
+        return new Stmt.DamDeclaration(name, multiplier, cap);
     }
 }
