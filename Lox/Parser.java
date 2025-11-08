@@ -37,12 +37,25 @@ class Parser {
             if (match(VAR)) return varDeclaration();
             if (match(RAINFALL)) return rainfallDeclaration();
             if (match(RIVER)) return riverDeclaration();
+            if (match(DAM)) return damDeclaration();
             
             return statement();
         } catch (ParseError error) {
             synchronize();
             return null;
         }
+    }
+
+    private Expr expression() {
+        return equality(); // Assuming equality is the starting point for expressions
+    }
+
+    private Stmt statement() {
+        if (match(TokenType.PRINT)) {
+            return printStatement();
+        }
+        // Add other statement types here...
+        return null; // Or throw an error for unsupported statements
     }
 
     private Stmt printStatement() {
@@ -295,5 +308,22 @@ class Parser {
 
             advance();
         }
+    }
+
+    private Stmt damDeclaration() {
+        Token name = consume(IDENTIFIER, "Expect dam name.");
+
+        Token multiplier = null;
+        Token cap = null;
+
+        if (match(WITH)) {
+            multiplier = consume(NUMBER, "Expect multiplier.");
+            if (match(COMMA)) {
+                cap = consume(NUMBER, "Expect cap.");
+            }
+        }
+
+        consume(SEMICOLON, "Expect ';' after dam declaration.");
+        return new Stmt.DamDeclaration(name, multiplier, cap);
     }
 }

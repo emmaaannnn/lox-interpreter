@@ -1,6 +1,14 @@
 package Lox;
 
 import java.util.List;
+import Lox.Stmt;
+import Lox.Stmt.DamDeclaration;
+import Lox.Stmt.RainfallDeclaration;
+import Lox.Stmt.RiverCombination;
+import Lox.Stmt.RiverCombinationExpr;
+import Lox.Stmt.RiverDeclaration;
+import Lox.Stmt.RiverDeclarationWithFlow;
+import Lox.Stmt.RiverFlow;
 
 abstract class Stmt {
     interface Visitor<R> {
@@ -11,6 +19,7 @@ abstract class Stmt {
         R visitRainfallDeclarationStmt(RainfallDeclaration stmt);
         R visitRiverDeclarationWithFlowStmt(RiverDeclarationWithFlow stmt);
         R visitRiverCombinationExprStmt(RiverCombinationExpr stmt);
+        R visitDamDeclarationStmt(DamDeclaration stmt);
     }
 
     static class Expression extends Stmt {
@@ -113,6 +122,39 @@ abstract class Stmt {
         @Override
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitRiverDeclarationWithFlowStmt(this);
+        }
+    }
+
+    static class DamDeclaration extends Stmt {
+        final Token name;
+        final Token multiplier; // optional, can be null
+        final Token cap;        // optional, can be null
+
+        DamDeclaration(Token name, Token multiplier, Token cap) {
+            this.name = name;
+            this.multiplier = multiplier;
+            this.cap = cap;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitDamDeclarationStmt(this);
+        }
+    }
+
+    public static class Print {
+        final Expr expression;
+        public Print(Expr expression) {
+            this.expression = expression;
+        }
+    }
+
+    public static class Var {
+        final Token name;
+        final Expr initializer;
+        public Var(Token name, Expr initializer) {
+            this.name = name;
+            this.initializer = initializer;
         }
     }
 
