@@ -1,0 +1,34 @@
+// Day 1: Basic dam logic
+rainfall = 4;
+var upstream_day1 = 20;
+var dam_level_day1 = 10;
+dam burra_day1 = upstream_day1 * 0.6 + rainfall * 0.3 + dam_level_day1 * 0.1;
+burra_day1;
+
+// Day 2: No rainfall, dam still flows
+rainfall = 0;
+var upstream_day2 = 18;
+var dam_level_day2 = 12;
+dam burra_day2 = upstream_day2 * 0.5 + dam_level_day2 * 0.2;
+burra_day2;
+
+// Day 3: High rainfall, dam increases release
+rainfall = 8;
+var upstream_day3 = 15;
+var dam_level_day3 = 9;
+dam burra_day3 = upstream_day3 * 0.4 + rainfall * 0.5 + dam_level_day3 * 0.1;
+burra_day3;
+
+// Day 4: Manual override — dam reduces flow
+rainfall = 2;
+var upstream_day4 = 25;
+var dam_level_day4 = 5;
+dam burra_day4 = upstream_day4 * 0.2; // ignores rainfall and dam level
+burra_day4;
+
+// Day 5: Dam closed — zero release
+rainfall = 6;
+var upstream_day5 = 30;
+var dam_level_day5 = 15;
+dam burra_day5 = 0;
+burra_day5;

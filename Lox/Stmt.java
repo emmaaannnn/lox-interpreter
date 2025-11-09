@@ -2,6 +2,7 @@ package Lox;
 
 import java.util.List;
 
+import Lox.Stmt.Dam;
 import Lox.Stmt.RainfallDeclaration;
 import Lox.Stmt.RiverCombination;
 import Lox.Stmt.RiverCombinationExpr;
@@ -20,6 +21,8 @@ abstract class Stmt {
         R visitRiverDeclarationWithFlowStmt(RiverDeclarationWithFlow stmt);
         R visitRiverCombinationExprStmt(RiverCombinationExpr stmt);
         R visitVarStmt(Var stmt);
+        R visitDamStmt(Dam stmt);
+        R visitLabelStmt(Label stmt);
     }
 
     static class Expression extends Stmt {
@@ -137,6 +140,36 @@ abstract class Stmt {
         @Override
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitVarStmt(this);
+        }
+    }
+
+    static class Dam extends Stmt {
+        final Token name;
+        final Expr algorithm;
+
+        Dam(Token name, Expr algorithm) {
+            this.name = name;
+            this.algorithm = algorithm;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitDamStmt(this);
+        }
+    }
+
+    static class Label extends Stmt {
+        final Token name;
+        final String label;
+
+        Label(Token name, String label) {
+            this.name = name;
+            this.label = label;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitLabelStmt(this);
         }
     }
 

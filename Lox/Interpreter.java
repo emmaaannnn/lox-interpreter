@@ -16,6 +16,7 @@ import java.util.Map;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     private final Map<String, Object> environment = new HashMap<>();
+    private final Map<String, String> labels = new HashMap<>();
 
     void interpret(List<Stmt> statements) {
         try {
@@ -132,7 +133,17 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Void visitExpressionStmt(Stmt.Expression stmt) {
         Object value = evaluate(stmt.expression);
-        System.out.println("= " + value);
+
+        if (stmt.expression instanceof Expr.Variable) {
+            String name = ((Expr.Variable) stmt.expression).name.lexeme;
+
+            // Auto-label logic
+            String label = autoLabel(name);
+            System.out.println(label + ": " + value + " L/s");
+        } else {
+            System.out.println("= " + value);
+        }
+
         return null;
     }
 
@@ -146,6 +157,19 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    @Override
+    public Void visitDamStmt(Stmt.Dam stmt) {
+        Object value = evaluate(stmt.algorithm);
+        environment.put(stmt.name.lexeme, value);
+        return null;
+    }
+
+    @Override
+    public Void visitLabelStmt(Stmt.Label stmt) {
+        labels.put(stmt.name.lexeme, stmt.label);
+        return null;
+    }
+
     // Utility methods
     private boolean isTruthy(Object obj) {
         if (obj == null) return false;
@@ -156,5 +180,20 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     private boolean isEqual(Object a, Object b) {
         if (a == null) return b == null;
         return a.equals(b);
+    }
+
+    private String autoLabel(String name) {
+        if (name.contains("_day")) {
+            String[] parts = name.split("_day");
+            String damName = capitalize(parts[0]);
+            String day = parts[1];
+            return damName + " Dam Day " + day;
+        }
+        return "Flow from " + name;
+    }
+
+    private String capitalize(String s) {
+        if (s.length() == 0) return s;
+        return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 }

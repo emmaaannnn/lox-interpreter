@@ -45,6 +45,9 @@ class Parser {
             if (match(RAINFALL)) return rainfallDeclaration();
             if (match(RIVER)) return riverDeclaration();
             if (match(VAR)) return varDeclaration();
+            if (match(DAM)) return damDeclaration();
+            if (match(LABEL)) return labelDeclaration();
+            
             return statement();
         } catch (ParseError error) {
             synchronize();
@@ -124,6 +127,22 @@ class Parser {
         return new Stmt.Var(name, initializer);
     }
 
+    private Stmt damDeclaration() {
+        Token name = consume(IDENTIFIER, "Expect dam name.");
+        consume(EQUAL, "Expect '=' after dam name.");
+        Expr algorithm = expression();
+        consume(SEMICOLON, "Expect ';' after dam declaration.");
+        return new Stmt.Dam(name, algorithm);
+    }
+
+    private Stmt labelDeclaration() {
+        Token name = consume(IDENTIFIER, "Expect variable name for label.");
+        consume(EQUAL, "Expect '=' after label name.");
+        Token labelToken = consume(STRING, "Expect string label.");
+        consume(SEMICOLON, "Expect ';' after label declaration.");
+        return new Stmt.Label(name, labelToken.literal.toString());
+    }
+
     private boolean checkNext(TokenType type) {
         if (current + 1 >= tokens.size()) return false;
         return tokens.get(current + 1).type == type;
@@ -196,6 +215,7 @@ class Parser {
         if (match(FALSE)) return new Expr.Literal(false);
         if (match(TRUE)) return new Expr.Literal(true);
         if (match(NIL)) return new Expr.Literal(null);
+        if (match(RAINFALL)) return new Expr.Variable(previous());
 
         if (match(NUMBER, STRING)) {
             return new Expr.Literal(previous().literal);

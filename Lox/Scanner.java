@@ -43,6 +43,7 @@ class Scanner {
         keywords.put("system", TokenType.SYSTEM);
         keywords.put("rainfall", TokenType.RAINFALL);
         keywords.put("with", TokenType.WITH);
+        keywords.put("label", TokenType.LABEL);
     }
     
     Scanner(String source) {

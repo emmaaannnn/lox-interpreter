@@ -24,7 +24,7 @@ enum TokenType {
     FLOWS_TO, COMBINE,
     
     RAINFALL, OUTPUT, SYSTEM, WITH,
-    RIVER, DAM,
+    RIVER, DAM, LABEL,
 
     // End of file.
     EOF

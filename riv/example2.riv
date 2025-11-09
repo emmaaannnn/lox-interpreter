@@ -1,8 +1,0 @@
-rainfall = 1;
-
-river yass = root with 8;
-river googong = root with 10;
-river jerrabombarra = root with 5;
-
-river molongolo = googong + jerrabombarra;
-river burrinjuck = molongolo + yass;
