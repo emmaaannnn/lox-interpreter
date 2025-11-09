@@ -33,7 +33,8 @@ class Parser {
     List<Stmt> parseStatements() {
         List<Stmt> statements = new ArrayList<>();
         while (!isAtEnd()) {
-            statements.add(declaration());
+            Stmt stmt = declaration();
+            if (stmt != null) statements.add(stmt);
         }
         return statements;
     }
@@ -43,6 +44,7 @@ class Parser {
         try {
             if (match(RAINFALL)) return rainfallDeclaration();
             if (match(RIVER)) return riverDeclaration();
+            if (match(VAR)) return varDeclaration();
             return statement();
         } catch (ParseError error) {
             synchronize();
@@ -51,7 +53,10 @@ class Parser {
     }
 
     private Stmt statement() {
-        // Extend with other statement types if needed
+        if (match(SEMICOLON)) {
+            // Allow empty statements like just a semicolon
+            return null;
+        }
         return new Stmt.Expression(expression());
     }
 
@@ -61,8 +66,12 @@ class Parser {
 
         if (match(EQUAL)) {
             // Peek ahead to decide if it's a symbolic combination or a type declaration
-            if (check(IDENTIFIER) && (checkNext(WITH) || checkNext(SEMICOLON))) {
-                Token type = consume(IDENTIFIER, "Expect 'root' or 'output'.");
+            if ((check(IDENTIFIER) || check(OUTPUT)) && (checkNext(WITH) || checkNext(SEMICOLON))) {
+                Token type = advance(); // consume either IDENTIFIER or OUTPUT
+                if (type.type == OUTPUT) {
+                    // Convert OUTPUT token to IDENTIFIER for compatibility
+                    type = new Token(IDENTIFIER, "output", "output", type.line);
+                }
                 if (match(WITH)) {
                     Token flowRate = consume(NUMBER, "Expect flow rate in L/s.");
                     consume(SEMICOLON, "Expect ';' after declaration.");
@@ -101,6 +110,18 @@ class Parser {
         Token value = consume(NUMBER, "Expect rainfall value in mm.");
         consume(SEMICOLON, "Expect ';' after rainfall declaration.");
         return new Stmt.RainfallDeclaration(value);
+    }
+
+    private Stmt varDeclaration() {
+        Token name = consume(IDENTIFIER, "Expect variable name.");
+
+        Expr initializer = null;
+        if (match(EQUAL)) {
+            initializer = expression();
+        }
+
+        consume(SEMICOLON, "Expect ';' after variable declaration.");
+        return new Stmt.Var(name, initializer);
     }
 
     private boolean checkNext(TokenType type) {
@@ -184,6 +205,10 @@ class Parser {
             Expr expr = expression();
             consume(RIGHT_PAREN, "Expect ')' after expression.");
             return new Expr.Grouping(expr);
+        }
+
+        if (match(IDENTIFIER)) {
+            return new Expr.Variable(previous());
         }
 
         throw error(peek(), "Expect expression.");

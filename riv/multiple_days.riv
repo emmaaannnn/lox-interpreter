@@ -1,0 +1,27 @@
+// Day 1
+rainfall = 2;
+var googong_day1 = 10;
+var jerrabombarra_day1 = 5;
+var molongolo_day1 = googong_day1 + jerrabombarra_day1;
+molongolo_day1 + 0;
+
+// Day 2
+rainfall = 5;
+var googong_day2 = 12;
+var jerrabombarra_day2 = 6;
+var molongolo_day2 = googong_day2 + jerrabombarra_day2;
+molongolo_day2 + 0;
+
+// Day 3
+rainfall = 1;
+var googong_day3 = 8;
+var jerrabombarra_day3 = 4;
+var molongolo_day3 = googong_day3 + jerrabombarra_day3;
+molongolo_day3 + 0;
+
+// Day 4
+rainfall = 0;
+var googong_day4 = 9;
+var jerrabombarra_day4 = 6;
+var molongolo_day4 = googong_day4 + jerrabombarra_day4;
+molongolo_day4 + 0;

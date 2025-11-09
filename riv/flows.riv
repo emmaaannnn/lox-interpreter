@@ -1,0 +1,8 @@
+rainfall = 1;
+
+river googong = root with 10;
+river jerrabombarra = root with 5;
+river molongolo = googong + jerrabombarra;
+river lake_burley_griffin = output;
+
+river molongolo flows lake_burley_griffin;

@@ -2,12 +2,19 @@ package Lox;
 
 import java.util.List;
 
+import Lox.Expr.Binary;
+import Lox.Expr.Grouping;
+import Lox.Expr.Literal;
+import Lox.Expr.Unary;
+import Lox.Expr.Variable;
+
 abstract class Expr {
     interface Visitor<R> {
         R visitBinaryExpr(Binary expr);
         R visitGroupingExpr(Grouping expr);
         R visitLiteralExpr(Literal expr);
         R visitUnaryExpr(Unary expr);
+        R visitVariableExpr(Variable expr);
     }
 
     static class Binary extends Expr {
@@ -66,6 +73,19 @@ abstract class Expr {
 
         final Token operator;
         final Expr right;
+    }
+
+    static class Variable extends Expr {
+        final Token name;
+
+        Variable(Token name) {
+            this.name = name;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitVariableExpr(this);
+        }
     }
 
     abstract <R> R accept(Visitor<R> visitor);
